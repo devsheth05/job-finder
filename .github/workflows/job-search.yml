@@ -1,0 +1,42 @@
+name: Job Search
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours
+  workflow_dispatch: {}      # lets you trigger it manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  run-crawler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write Google service account key
+        run: echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}' > service_account.json
+
+      - name: Run job search
+        run: python main.py
+
+      - name: Remove secret file
+        if: always()
+        run: rm -f service_account.json
+
+      # jobs.db is committed back to the repo so dedup/first-seen history
+      # persists across runs -- simpler and more durable than actions/cache.
+      - name: Commit updated job database
+        run: |
+          git config user.name "job-finder-bot"
+          git config user.email "actions@github.com"
+          git add jobs.db
+          git diff --cached --quiet || git commit -m "Update job database [skip ci]"
+          git push
