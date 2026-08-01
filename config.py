@@ -11,7 +11,7 @@ Edit this file to tune the job hunt without touching the crawler logic.
 
 POSITIVE_KEYWORDS = {
     # role-level signals
-    "new grad": 40, "university grad": 40, "campus": 35, "early career": 35,
+    "New Grad": 80, "university grad": 40, "campus": 35, "early career": 65,
     "entry level": 35, "entry-level": 35, "associate": 20,
     "software engineer i": 30, "swe i": 30, "software engineer 1": 30,
     # discipline
@@ -19,15 +19,32 @@ POSITIVE_KEYWORDS = {
     "full stack": 15, "full-stack": 15, "platform": 12, "infrastructure": 15,
     "distributed systems": 15, "cloud": 10, "ai": 10, "machine learning": 12,
     "ml engineer": 15,
+    # add these into POSITIVE_KEYWORDS
+    "product manager": 30, "technical program manager": 30, "tpm": 25,
+    "data analyst": 25, "data scientist": 30, "data science": 25,
+    "business analyst": 20,
 }
 
 NEGATIVE_KEYWORDS = {
-    "senior": -100, "sr.": -100, "staff": -100, "principal": -100,
+    "sr.": -100, "staff": -100, "principal": -100,
     "lead ": -80, "manager": -100, "director": -100, "architect": -60,
     "vp ": -100, "vice president": -100, "5+ years": -80, "7+ years": -100,
     "8+ years": -100, "10+ years": -100, "phd required": -40,
 }
-
+# If any of these appear in the job TITLE, the job is excluded outright,
+# no matter what else it scores on. These are non-technical functions that
+# occasionally pick up false-positive points from generic company boilerplate
+# in the description (e.g. a Tax role mentioning "cloud infrastructure" in
+# the company's About Us blurb).
+HARD_EXCLUDE_TITLE_KEYWORDS = [
+    "tax", "attorney", "counsel", "legal", "paralegal",
+    "accountant", "accounting", "auditor", "audit", "actuary", "payroll",
+    "compliance officer", "recruiter", "talent acquisition",
+    "account executive", "sales representative", "sales development",
+    "marketing manager", "marketing specialist", "content marketing",
+    "human resources", "hr business partner", "hr generalist",
+    "underwriter", "claims adjuster", "financial advisor", "wealth management",
+]
 # Location tiers -> score bonus. Matched against the job's location string(s).
 LOCATION_TIERS = {
     1: {  # +30
@@ -48,7 +65,7 @@ LOCATION_TIERS = {
     "remote": {"score": 20, "places": ["remote"]},
 }
 
-SCORE_THRESHOLD = 10  # jobs below this score are dropped, not written to the sheet
+SCORE_THRESHOLD = 20  # jobs below this score are dropped, not written to the sheet
 
 STAR_BANDS = [(95, 5), (80, 4), (60, 3), (40, 2), (0, 1)]  # (min_score, stars)
 

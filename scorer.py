@@ -3,18 +3,24 @@ import config
 
 
 def score_job(job: dict) -> int:
-    text = f"{job.get('title', '')} {job.get('description', '')}".lower()
+    title = job.get("title", "").lower()
     location = job.get("location", "").lower()
+
+    # Hard exclude non-technical functions, checked on title only
+    if any(kw in title for kw in config.HARD_EXCLUDE_TITLE_KEYWORDS):
+        return -1000
 
     score = 0
 
+    # Positive/negative keywords matched on TITLE only -- avoids false
+    # positives from generic company boilerplate in the description
     for kw, weight in config.POSITIVE_KEYWORDS.items():
-        if kw in text:
+        if kw in title:
             score += weight
 
     for kw, weight in config.NEGATIVE_KEYWORDS.items():
-        if kw in text:
-            score += weight  # weight is already negative
+        if kw in title:
+            score += weight
 
     if job.get("remote"):
         score += config.LOCATION_TIERS["remote"]["score"]

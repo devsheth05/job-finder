@@ -10,7 +10,7 @@ import config
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive.file",
+    "https://www.googleapis.com/auth/drive.readonly",
 ]
 
 
@@ -21,9 +21,16 @@ def get_worksheet():
     try:
         sheet = client.open(config.GOOGLE_SHEET_NAME)
     except gspread.SpreadsheetNotFound:
-        sheet = client.create(config.GOOGLE_SHEET_NAME)
-        print(f"Created new spreadsheet '{config.GOOGLE_SHEET_NAME}'. "
-              f"Share it with yourself from Google Drive if you can't see it.")
+        raise SystemExit(
+            f"\nCouldn't find a spreadsheet named '{config.GOOGLE_SHEET_NAME}'.\n"
+            f"Service accounts can't create their own spreadsheets (they have no "
+            f"Drive storage quota), so you need to create it yourself:\n"
+            f"  1. Go to sheets.google.com and create a sheet named exactly "
+            f"'{config.GOOGLE_SHEET_NAME}'\n"
+            f"  2. Share it with your service account's email (Editor access) -- "
+            f"find the email in service_account.json under 'client_email'\n"
+            f"  3. Run this script again\n"
+        )
 
     try:
         ws = sheet.worksheet(config.GOOGLE_WORKSHEET_NAME)

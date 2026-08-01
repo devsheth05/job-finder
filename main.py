@@ -13,8 +13,7 @@ from datetime import datetime, timezone
 import config
 import database
 import scorer
-from sources import simplify, greenhouse, lever, ashby
-
+from sources import simplify, greenhouse, lever, ashby, discover
 
 def gather_all_jobs() -> list[dict]:
     jobs = []
@@ -22,20 +21,22 @@ def gather_all_jobs() -> list[dict]:
     jobs += simplify.fetch_all()
     print(f"  -> {len(jobs)} so far")
 
+    print("Discovering companies from Simplify's own listings...")
+    discovered = discover.discover_companies()
+
     print("Polling Greenhouse boards...")
-    jobs += greenhouse.fetch_all()
+    jobs += greenhouse.fetch_all(sorted(discovered["greenhouse"]))
     print(f"  -> {len(jobs)} so far")
 
     print("Polling Lever boards...")
-    jobs += lever.fetch_all()
+    jobs += lever.fetch_all(sorted(discovered["lever"]))
     print(f"  -> {len(jobs)} so far")
 
     print("Polling Ashby boards...")
-    jobs += ashby.fetch_all()
+    jobs += ashby.fetch_all(sorted(discovered["ashby"]))
     print(f"  -> {len(jobs)} so far")
 
     return jobs
-
 
 def build_sheet_row(record, sources_str: str) -> list:
     stars_str = "★" * scorer.stars(record["score"])
