@@ -12,7 +12,7 @@ BASE = "https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
 
 
 def _normalize(company_token: str, entry: dict) -> dict:
-    location = (entry.get("location") or {}).get("name", "Unknown")
+    location = (entry.get("location") or {}).get("name") or "Unknown"
     return {
         "company": company_token,
         "title": entry.get("title", "Unknown"),

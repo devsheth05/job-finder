@@ -12,7 +12,7 @@ BASE = "https://api.lever.co/v0/postings/{company}"
 
 def _normalize(company: str, entry: dict) -> dict:
     categories = entry.get("categories", {}) or {}
-    location = categories.get("location", "Unknown") or "Unknown"
+    location = categories.get("location") or "Unknown"
     return {
         "company": company,
         "title": entry.get("text", "Unknown"),

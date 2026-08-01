@@ -11,7 +11,7 @@ BASE = "https://api.ashbyhq.com/posting-api/job-board/{company}"
 
 
 def _normalize(company: str, entry: dict) -> dict:
-    location = entry.get("location", "Unknown") or "Unknown"
+    location = entry.get("location") or "Unknown"
     return {
         "company": company,
         "title": entry.get("title", "Unknown"),
