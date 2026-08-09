@@ -9,7 +9,7 @@ import config
 HEADERS = {"User-Agent": "job-finder-bot/1.0"}
 BASE = "https://api.ashbyhq.com/posting-api/job-board/{company}"
 
-
+#test
 def _normalize(company: str, entry: dict) -> dict:
     location = entry.get("location") or "Unknown"
     return {
